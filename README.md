@@ -53,7 +53,7 @@ AI-Business-Intelligence-Assistant/
 ## Setup Instructions
 
 ### 1. Clone the repository
-git clone https://github.com/your-username/AI-Business-Intelligence-Assistant.git
+git clone https://github.com/aasthakansal47/AI-Business-Intelligence-Assistant.git
 
 ---
 

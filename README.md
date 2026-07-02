@@ -1,118 +1,193 @@
-# AI Business Intelligence Assistant
+# 🤖 AI Business Intelligence Assistant
 
-An AI-powered Business Intelligence project that converts natural language questions into SQL queries, runs them on a MySQL database, and generates charts and business insights automatically.
-
----
-
-## Features
-
-- Convert natural language into SQL queries using AI
-- Connect with MySQL database
-- Execute SQL queries and fetch results
-- Automatically generate bar charts
-- Generate business insights using AI
-- Fallback SQL support if AI fails
-- Save charts locally in dashboard folder
+An AI-powered Business Intelligence Assistant that converts natural language questions into SQL queries using Google Gemini AI, executes them on a MySQL database, visualizes the results with charts, and generates AI-driven business insights.
 
 ---
 
-## Tech Stack
+## 🚀 Features
+
+- 🤖 Convert natural language questions into SQL using Google Gemini AI
+- 🗄️ Execute SQL queries on MySQL
+- 📊 Automatically generate business charts
+- 💡 AI-generated business insights
+- 📈 Display results in a formatted table
+- 🔐 Secure API key management using .env
+- 📂 Save generated charts automatically
+- ⚡ Fast and interactive command-line interface
+
+---
+
+## 🛠️ Tech Stack
 
 - Python
-- MySQL
 - Google Gemini API
+- MySQL
 - Matplotlib
 - Tabulate
 - Python-dotenv
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
+```
 AI-Business-Intelligence-Assistant/
+│
+├── dashboard/
+│   └── chart.png
+│
+├── data/
+│   └── SampleSuperstore.csv
 │
 ├── python/
 │   ├── main.py
 │   ├── charts.py
 │   ├── database.py
-│   ├── read_data.py
 │   ├── filter_data.py
 │   ├── groupby_data.py
-│   └── .env
+│   ├── read_data.py
+│   └── .env (Not uploaded)
 │
-├── data/
-│   └── SampleSuperstore.csv
-│
-├── dashboard/
-│   └── chart.png
-│
-└── README.md
+├── .gitignore
+├── README.md
+```
 
 ---
 
-## Setup Instructions
+## ⚙️ Installation
 
-### 1. Clone the repository
+### Clone Repository
+
+```bash
 git clone https://github.com/aasthakansal47/AI-Business-Intelligence-Assistant.git
+```
 
 ---
 
-### 2. Install dependencies
-pip install mysql-connector-python
+### Install Dependencies
+
+```bash
 pip install google-genai
+pip install mysql-connector-python
 pip install matplotlib
 pip install tabulate
 pip install python-dotenv
+```
 
 ---
 
-### 3. Create MySQL database
-CREATE DATABASE ai_business_intelligence;
+### Create MySQL Database
 
-Use table: samplesuperstore
+Create a MySQL database named:
+
+```sql
+ai_business_intelligence
+```
+
+Import the **SampleSuperstore** dataset into a table named:
+
+```text
+samplesuperstore
+```
 
 ---
 
-### 4. Create .env file
-GEMINI_API_KEY=your_api_key_here
+### Create .env File
+
+Inside the **python** folder, create a file named `.env`
+
+Add your Gemini API key:
+
+```env
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
 
 ---
 
-### 5. Run project
+## ▶️ Run the Project
+
+```bash
 python python/main.py
+```
 
 ---
 
-## Example Questions
+## 💬 Sample Questions
 
 - Show total sales by category
-- Which segment has highest sales?
-- Show profit by region
-- Top 5 cities by sales
-- Sales distribution by state
+- Show total profit by category
+- Which segment has the highest sales?
+- Show sales by region
+- Show top 10 cities by sales
+- Show total profit by state
+- Which category generated the highest profit?
+- Compare sales across regions
+- Show average sales by category
+- Show total quantity sold by category
 
 ---
 
-## Output
+## 📊 Output
 
-- SQL query generated automatically
-- Data displayed in table format
-- Bar chart saved in dashboard folder
-- Business insights generated using AI
+The assistant automatically:
 
----
-
-## Important Note
-
-Do NOT upload .env file to GitHub.  
-It contains your API key.
-
-Add this to .gitignore:
-.env
-__pycache__/
+- Converts English questions into SQL
+- Executes SQL queries
+- Displays formatted tables
+- Generates bar charts
+- Saves charts inside the dashboard folder
+- Generates AI-powered business insights
 
 ---
 
-## Author
+## 📸 Sample Output
 
-Aastha Kansal
+Example:
+
+**Question**
+
+```
+Show total sales by category
+```
+
+Generated SQL
+
+```sql
+SELECT Category, SUM(Sales)
+FROM samplesuperstore
+GROUP BY Category;
+```
+
+Output
+
+```
+Technology     836154
+Furniture      741999
+Office Supplies 719047
+```
+
+---
+
+## 🔒 Security
+
+The `.env` file is excluded from GitHub using `.gitignore`.
+
+Never upload your API key.
+
+---
+
+## 👩‍💻 Author
+
+**Aastha Kansal**
+
+B.Tech CSE | AI & Data Analytics Enthusiast
+
+GitHub:
+https://github.com/aasthakansal47
+
+LinkedIn:
+(https://www.linkedin.com/in/aastha-kansal-561533311/)
+
+---
+
+⭐ If you found this project useful, consider giving it a star!

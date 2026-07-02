@@ -1,69 +1,88 @@
 import os
-from charts import create_bar_chart
 import mysql.connector
 from dotenv import load_dotenv
 from google import genai
 from tabulate import tabulate
+from charts import create_bar_chart
 
-# Load environment variables
+# ---------------- LOAD API KEY ----------------
 load_dotenv()
 
-# Gemini client (NEW SDK)
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+api_key = os.getenv("GEMINI_API_KEY")
+
+print("Loaded API Key:", api_key)
+
+if not api_key:
+    raise ValueError("GEMINI_API_KEY not found in .env file")
+
+client = genai.Client(api_key=api_key)
 
 print("=" * 50)
 print(" AI Business Intelligence Assistant ")
 print("=" * 50)
 
-# User input
+# ---------------- USER QUESTION ----------------
 question = input("\nAsk your business question: ")
 
-# ---------------- PROMPT FOR SQL ----------------
+# ---------------- PROMPT ----------------
 prompt = f"""
 You are an expert MySQL developer.
 
 Database Name: ai_business_intelligence
-Table Name: samplesuperstore
+
+Table Name:
+samplesuperstore
 
 Columns:
-Ship Mode, Segment, Country, City, State, Postal Code, Region,
-Category, Sub-Category, Sales, Quantity, Discount, Profit
+Ship Mode,
+Segment,
+Country,
+City,
+State,
+Postal Code,
+Region,
+Category,
+Sub-Category,
+Sales,
+Quantity,
+Discount,
+Profit
 
-Generate ONLY a valid MySQL query.
-No explanation.
-No markdown.
-Return only SQL.
+Rules:
+1. Return ONLY valid MySQL query.
+2. No markdown.
+3. No explanation.
+4. No ```sql
+5. Query must work directly in MySQL.
 
 User Question:
 {question}
 """
 
-# ---------------- SAFE SQL (FALLBACK MODE) ----------------
+# ---------------- GEMINI SQL ----------------
 try:
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt
     )
+
     sql_query = response.text.strip()
 
-except Exception:
-    if "segment" in question.lower():
-     sql_query = "SELECT Segment, SUM(Sales) FROM samplesuperstore GROUP BY Segment;"
+    sql_query = (
+        sql_query.replace("```sql", "")
+                 .replace("```", "")
+                 .strip()
+    )
 
-    elif "region" in question.lower():
-     sql_query = "SELECT Region, SUM(Sales) FROM samplesuperstore GROUP BY Region;"
-
-    elif "profit" in question.lower():
-     sql_query = "SELECT Category, SUM(Profit) FROM samplesuperstore GROUP BY Category;"
-
-    else:
-     sql_query = "SELECT Category, SUM(Sales) FROM samplesuperstore GROUP BY Category;"
-    print("\n⚠️ Gemini failed — using fallback SQL")
+except Exception as e:
+    print("\nGemini Error:")
+    print(e)
+    exit()
 
 print("\nGenerated SQL Query:\n")
 print(sql_query)
 
-# ---------------- MYSQL CONNECTION ----------------
+# ---------------- MYSQL ----------------
 connection = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -72,20 +91,30 @@ connection = mysql.connector.connect(
 )
 
 cursor = connection.cursor()
-cursor.execute(sql_query)
+
+try:
+    cursor.execute(sql_query)
+
+except Exception as e:
+    print("\nSQL Error:")
+    print(e)
+    cursor.close()
+    connection.close()
+    exit()
 
 rows = cursor.fetchall()
 headers = [i[0] for i in cursor.description]
 
 print("\nQuery Result:\n")
 
+print(tabulate(rows, headers=headers, tablefmt="grid"))
+
 # ---------------- CHART ----------------
 if len(headers) == 2:
-    print("Creating Chart...")
+    print("\nCreating Chart...")
     create_bar_chart(headers, rows)
 
-print(tabulate(rows, headers=headers, tablefmt="grid"))
-# ---------------- CONVERT RESULT TO TEXT ----------------
+# ---------------- AI INSIGHTS ----------------
 result_text = ""
 
 for row in rows:
@@ -94,35 +123,33 @@ for row in rows:
 insight_prompt = f"""
 You are a Senior Business Analyst.
 
-The user asked:
+User Question:
 {question}
 
 SQL Result:
 {result_text}
 
-Write 3 business insights in simple English.
-Do not mention SQL.
-Keep it short.
+Give exactly 3 business insights.
+
+Keep them short.
+
+Simple English.
 """
 
-# ---------------- SAFE AI INSIGHTS ----------------
 try:
+
     insight = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=insight_prompt
     )
-    insight_text = insight.text
+
+    print("\nBusiness Insights:\n")
+    print(insight.text)
 
 except Exception as e:
-    insight_text = "AI insights unavailable (quota exceeded or API error)."
 
-print("\nBusiness Insights:\n")
-
-insight_text = "AI temporarily unavailable. Showing data-driven insights only."
-print(insight_text)
-
-print("\nQuick Manual Insight:")
-print("Technology category has highest sales, indicating strong demand in tech products.")
+    print("\nGemini Insight Error:")
+    print(e)
 
 cursor.close()
 connection.close()
